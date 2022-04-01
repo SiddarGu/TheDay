@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 
 void main() => runApp(const MyApp());
 
@@ -69,12 +68,12 @@ class _DateTextState extends State<DateText> {
 }
 
 class _MyStatefulWidgetState extends State<MyStatefulWidget> {
-  List<int> bottom = <int>[0];
-  List<Event> events = <Event>[];
+  final List<Event> _events = <Event>[];
   static int _selectedIndex = 0;
   Color themeColor = Colors.teal;
 /*   static Event curr = Event(date: DateTime.now());
- */  static DateTime curr = DateTime.now();
+ */
+  static DateTime curr = DateTime.now();
   TextEditingController eventController = TextEditingController();
   final PageController _pageController = PageController(
     initialPage: 0,
@@ -96,34 +95,33 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     // type 2 = months
     DateTime now = DateTime.now();
     if (type == 0) {
-      return now.difference(events[index].date).inDays.toString();
+      return now.difference(_events[index].date).inDays.toString();
     } else if (type == 1) {
-      return (now.difference(events[index].date).inDays ~/ 7).toString();
+      return (now.difference(_events[index].date).inDays ~/ 7).toString();
     } else if (type == 2) {
-      return (now.difference(events[index].date).inDays ~/ 30).toString();
+      return (now.difference(_events[index].date).inDays ~/ 30).toString();
     }
     return '';
+  }
+
+  String _getName(int index) {
+    if (_events[index].name.isNotEmpty) {
+      return _events[index].name;
+    } else {
+      return '';
+    }
   }
 
   String _getDate(int index) {
-    if (index < events.length) {
-      return events[index].date.day.toString() +
+    if (index < _events.length) {
+      return _events[index].date.day.toString() +
           '/' +
-          events[index].date.month.toString() +
+          _events[index].date.month.toString() +
           '/' +
-          events[index].date.year.toString();
+          _events[index].date.year.toString();
     }
     return '';
   }
-
-/*   void _onSwipe(int index) {
-    setState(() {
-      _selectedIndex = index;
-      themeColor = index == 0
-          ? Colors.teal
-          : (index == 1 ? Colors.cyan : Colors.lightBlue);
-    });
-  } */
 
   void _onItemTapped(int index) {
     setState(() {
@@ -138,8 +136,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
   @override
   Widget build(BuildContext context) {
-    const Key centerKey = ValueKey<String>('bottom-sliver-list');
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('The Day'),
@@ -152,21 +148,37 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         },
         children: [
           Center(
-            child: CustomScrollView(
-              slivers: <Widget>[
-                SliverList(
-                  key: centerKey,
-                  delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      return Card(
-                        margin:
-                            const EdgeInsets.only(top: 10, left: 10, right: 10),
-                        child: Container(
+            child: ListView.builder(
+              itemBuilder: (context, index) {
+                return Card(
+                    margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
+                    color: themeColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    child: ExpansionTile(
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(_getName(index) + ' '),
+                          Row(
+                            children: [
+                              Text(
+                                _differnce(index, 0),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 30),
+                              ),
+                              const Text(' days')
+                            ],
+                          ),
+                        ],
+                      ),
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15, right: 10),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(_getDate(index)),
-                              Text(_differnce(index, 0)),
                               IconButton(
                                   onPressed: () {
                                     showDialog(
@@ -192,8 +204,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                         }).then((exit) {
                                       if (exit) {
                                         setState(() {
-                                          bottom.removeAt(index);
-                                          events.removeAt(index);
+                                          _events.removeAt(index);
                                         });
                                       }
                                     });
@@ -201,161 +212,149 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                                   icon: const Icon(Icons.delete)),
                             ],
                           ),
-
-                          alignment: Alignment.center,
-                          //color: Colors.blue[200 + bottom[index] % 4 * 100],
-                          height: 100,
-                          //child: ,
-
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: themeColor,
-                          ),
-                        ),
-                      );
-                    },
-                    childCount: events.length,
-                  ),
-                ),
-              ],
+                        )
+                      ],
+                    ));
+              },
+              itemCount: _events.length,
             ),
           ),
           Center(
-            child: CustomScrollView(
-              slivers: <Widget>[
-                SliverList(
-                  key: centerKey,
-                  delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      return Card(
-                        margin:
-                            const EdgeInsets.only(top: 10, left: 10, right: 10),
-                        child: Container(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            child: ListView.builder(
+              itemBuilder: (context, index) {
+                return Card(
+                    margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
+                    color: themeColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    child: ExpansionTile(
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(_getName(index) + ' '),
+                          Row(
                             children: [
-                              Text(_getDate(index)),
-                              Text(_differnce(index, 1)),
-                              IconButton(
-                                  onPressed: () {
-                                    showDialog(
-                                        context: context,
-                                        builder: (_) {
-                                          return AlertDialog(
-                                            title: const Text('Delete?'),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () => Navigator.pop(
-                                                    context,
-                                                    false), // passing false
-                                                child: const Text('Cancel'),
-                                              ),
-                                              TextButton(
-                                                onPressed: () => Navigator.pop(
-                                                    context,
-                                                    true), // passing true
-                                                child: const Text('Delete'),
-                                              ),
-                                            ],
-                                          );
-                                        }).then((exit) {
-                                      if (exit) {
-                                        setState(() {
-                                          bottom.removeAt(index);
-                                          events.removeAt(index);
-                                        });
-                                      }
-                                    });
-                                  },
-                                  icon: const Icon(Icons.delete)),
+                              Text(
+                                _differnce(index, 1),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 30),
+                              ),
+                              const Text(' weeks')
                             ],
                           ),
-
-                          alignment: Alignment.center,
-                          //color: Colors.blue[200 + bottom[index] % 4 * 100],
-                          height: 100,
-                          //child: ,
-
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: themeColor,
-                          ),
+                        ],
+                      ),
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(_getDate(index)),
+                            IconButton(
+                                onPressed: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (_) {
+                                        return AlertDialog(
+                                          title: const Text('Delete?'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.pop(
+                                                  context,
+                                                  false), // passing false
+                                              child: const Text('Cancel'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () => Navigator.pop(
+                                                  context,
+                                                  true), // passing true
+                                              child: const Text('Delete'),
+                                            ),
+                                          ],
+                                        );
+                                      }).then((exit) {
+                                    if (exit) {
+                                      setState(() {
+                                        _events.removeAt(index);
+                                      });
+                                    }
+                                  });
+                                },
+                                icon: const Icon(Icons.delete)),
+                          ],
                         ),
-                      );
-                    },
-                    childCount: events.length,
-                  ),
-                ),
-              ],
+                      ],
+                    ));
+              },
+              itemCount: _events.length,
             ),
           ),
           Center(
-            child: CustomScrollView(
-              slivers: <Widget>[
-                SliverList(
-                  key: centerKey,
-                  delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      return Card(
-                        margin:
-                            const EdgeInsets.only(top: 10, left: 10, right: 10),
-                        child: Container(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            child: ListView.builder(
+              itemBuilder: (context, index) {
+                return Card(
+                    margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
+                    color: themeColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    child: ExpansionTile(
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(_getName(index) + ' '),
+                          Row(
                             children: [
-                              Text(_getDate(index)),
-                              Text(_differnce(index, 2)),
-                              IconButton(
-                                  onPressed: () {
-                                    showDialog(
-                                        context: context,
-                                        builder: (_) {
-                                          return AlertDialog(
-                                            title: const Text('Delete?'),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () => Navigator.pop(
-                                                    context,
-                                                    false), // passing false
-                                                child: const Text('Cancel'),
-                                              ),
-                                              TextButton(
-                                                onPressed: () => Navigator.pop(
-                                                    context,
-                                                    true), // passing true
-                                                child: const Text('Delete'),
-                                              ),
-                                            ],
-                                          );
-                                        }).then((exit) {
-                                      if (exit) {
-                                        setState(() {
-                                          bottom.removeAt(index);
-                                          events.removeAt(index);
-                                        });
-                                      }
-                                    });
-                                  },
-                                  icon: const Icon(Icons.delete)),
+                              Text(
+                                _differnce(index, 2),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 30),
+                              ),
+                              const Text(' months')
                             ],
                           ),
-
-                          alignment: Alignment.center,
-                          //color: Colors.blue[200 + bottom[index] % 4 * 100],
-                          height: 100,
-                          //child: ,
-
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: themeColor,
-                          ),
+                        ],
+                      ),
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(_getDate(index)),
+                            IconButton(
+                                onPressed: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (_) {
+                                        return AlertDialog(
+                                          title: const Text('Delete?'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.pop(
+                                                  context,
+                                                  false), // passing false
+                                              child: const Text('Cancel'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () => Navigator.pop(
+                                                  context,
+                                                  true), // passing true
+                                              child: const Text('Delete'),
+                                            ),
+                                          ],
+                                        );
+                                      }).then((exit) {
+                                    if (exit) {
+                                      setState(() {
+                                        _events.removeAt(index);
+                                      });
+                                    }
+                                  });
+                                },
+                                icon: const Icon(Icons.delete)),
+                          ],
                         ),
-                      );
-                    },
-                    childCount: events.length,
-                  ),
-                ),
-              ],
+                      ],
+                    ));
+              },
+              itemCount: _events.length,
             ),
           ),
         ],
@@ -402,6 +401,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          eventController.text = '';
           showDialog(
               context: context,
               builder: (BuildContext context) {
@@ -433,13 +433,13 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
               }).then((exit) {
             if (exit) {
               setState(() {
-                bottom.add(bottom.length);
-                events.add(Event(date: curr, name: eventController.text));
+                _events.add(Event(date: curr, name: eventController.text));
               });
             } else {
               eventController.clear();
             }
           });
+          curr = DateTime.now();
         },
         backgroundColor: themeColor,
         child: const Icon(Icons.add),
@@ -450,6 +450,16 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
 class Event {
   DateTime date;
-  String name = '';
-  Event({required this.date, required this.name});
+  String name;
+  bool isExpanded;
+  Event({required this.date, required this.name, this.isExpanded = false});
+}
+
+List<Event> generateEvents(int numberOfEvents, DateTime date, String name) {
+  return List<Event>.generate(numberOfEvents, (int index) {
+    return Event(
+      date: date,
+      name: name,
+    );
+  });
 }
