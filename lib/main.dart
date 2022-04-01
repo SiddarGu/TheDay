@@ -34,7 +34,7 @@ class _DateTextState extends State<DateText> {
   DateTime selectedDate = DateTime.now();
 
   String date =
-      '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}';
+      '${DateTime.now().month}/${DateTime.now().day}/${DateTime.now().year}';
   @override
   void initState() {
     super.initState();
@@ -55,7 +55,7 @@ class _DateTextState extends State<DateText> {
                         if (value != null && value != selectedDate) {
                           selectedDate = value;
                           date =
-                              '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}';
+                              '${selectedDate.month}/${selectedDate.day}/${selectedDate.year}';
                           _MyStatefulWidgetState.curr = selectedDate;
                         }
                       }));
@@ -87,7 +87,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   }
 
   String date =
-      '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}';
+      '${DateTime.now().month}/${DateTime.now().day}/${DateTime.now().year}';
 
   String _differnce(int index, int type) {
     // type 0 = days
@@ -114,9 +114,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 
   String _getDate(int index) {
     if (index < _events.length) {
-      return _events[index].date.day.toString() +
+      return _events[index].date.month.toString() +
           '/' +
-          _events[index].date.month.toString() +
+          _events[index].date.day.toString() +
           '/' +
           _events[index].date.year.toString();
     }
