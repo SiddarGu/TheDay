@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 void main() => runApp(const MyApp());
 
+// main app
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -29,12 +30,14 @@ class DateText extends StatefulWidget {
   State<DateText> createState() => _DateTextState();
 }
 
+// The date picker
 class _DateTextState extends State<DateText> {
+  // default date value
   String time = '';
   DateTime selectedDate = DateTime.now();
-
   String date =
       '${DateTime.now().month}/${DateTime.now().day}/${DateTime.now().year}';
+
   @override
   void initState() {
     super.initState();
@@ -53,6 +56,7 @@ class _DateTextState extends State<DateText> {
                       lastDate: DateTime.now())
                   .then((value) => setState(() {
                         if (value != null && value != selectedDate) {
+                          // update date if selected
                           selectedDate = value;
                           date =
                               '${selectedDate.month}/${selectedDate.day}/${selectedDate.year}';
@@ -67,14 +71,19 @@ class _DateTextState extends State<DateText> {
   }
 }
 
+
+// main app
 class _MyStatefulWidgetState extends State<MyStatefulWidget> {
+  // a list containing event name and time
   final List<Event> _events = <Event>[];
+  // index for screen
   static int _selectedIndex = 0;
+  // color for each screen
   Color themeColor = Colors.teal;
-/*   static Event curr = Event(date: DateTime.now());
- */
+
   static DateTime curr = DateTime.now();
-  TextEditingController eventController = TextEditingController();
+  TextEditingController _eventController = TextEditingController();
+  // controlling the swipe gestures
   final PageController _pageController = PageController(
     initialPage: 0,
     keepPage: true,
@@ -89,6 +98,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   String date =
       '${DateTime.now().month}/${DateTime.now().day}/${DateTime.now().year}';
 
+  // calculat the difference between two dates
   String _differnce(int index, int type) {
     // type 0 = days
     // type 1 = weeks
@@ -104,6 +114,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     return '';
   }
 
+  // returns the name of the event
   String _getName(int index) {
     if (_events[index].name.isNotEmpty) {
       return _events[index].name;
@@ -112,6 +123,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     }
   }
 
+  // return the date in string format
   String _getDate(int index) {
     if (index < _events.length) {
       return _events[index].date.month.toString() +
@@ -123,6 +135,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     return '';
   }
 
+  // changing screens and the color
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -147,6 +160,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           _onItemTapped(index);
         },
         children: [
+          // days screen
           Center(
             child: ListView.builder(
               itemBuilder: (context, index) {
@@ -219,6 +233,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
               itemCount: _events.length,
             ),
           ),
+          // weeks screen
           Center(
             child: ListView.builder(
               itemBuilder: (context, index) {
@@ -288,6 +303,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
               itemCount: _events.length,
             ),
           ),
+          // months screen
           Center(
             child: ListView.builder(
               itemBuilder: (context, index) {
@@ -364,7 +380,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Text('DAYS', style: TextStyle(fontSize: 12)),
-            label: 'Home',
+            label: 'Days',
             activeIcon: Text('DAYS',
                 style: TextStyle(
                     color: Colors.white,
@@ -374,7 +390,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           ),
           BottomNavigationBarItem(
             icon: Text('WEEKS', style: TextStyle(fontSize: 12)),
-            label: 'Business',
+            label: 'Weeks',
             activeIcon: Text('WEEKS',
                 style: TextStyle(
                     color: Colors.white,
@@ -384,7 +400,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           ),
           BottomNavigationBarItem(
             icon: Text('MONTHS', style: TextStyle(fontSize: 12)),
-            label: 'School',
+            label: 'Months',
             activeIcon: Text('MONTHS',
                 style: TextStyle(
                     color: Colors.white,
@@ -399,9 +415,11 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         selectedItemColor: Colors.white,
         onTap: _onItemTapped,
       ),
+      // fab on the lower right part
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          eventController.text = '';
+          _eventController.text = '';
+          // creating event dialog
           showDialog(
               context: context,
               builder: (BuildContext context) {
@@ -410,7 +428,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                     decoration: const InputDecoration(
                       hintText: 'Event name',
                     ),
-                    controller: eventController,
+                    controller: _eventController,
                   ),
                   content: const DateText(),
                   actions: [
@@ -433,10 +451,10 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
               }).then((exit) {
             if (exit) {
               setState(() {
-                _events.add(Event(date: curr, name: eventController.text));
+                _events.add(Event(date: curr, name: _eventController.text));
               });
             } else {
-              eventController.clear();
+              _eventController.clear();
             }
           });
           curr = DateTime.now();
